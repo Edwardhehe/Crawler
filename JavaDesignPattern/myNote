@@ -1,0 +1,6 @@
+1.多态：
+不能再静态方法中访问非静态变量和非静态方法，比如main方法中訪問非static變量和方法
+abstract 類可以包含非抽象方法的；
+interface
+所有的field都需要是public static final
+必須為abstract方法
