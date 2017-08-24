@@ -4,3 +4,30 @@ abstract 類可以包含非抽象方法的；
 interface
 所有的field都需要是public static final
 必須為abstract方法
+
+
+Strategy Pattern
+1.建立一个interface;
+2.实现该interface，得到若干个类
+3.在一个class中新建一个类作为其fields
+
+public Flys flyingType
+
+4.后续建立方法利用此类，实现功能
+
+在父类写入这个方法，fields中写入这个类，利用对象
+若干个类都有这样一个行为：
+
+name可以写一个这个行为的接口，利用不同的方式实现这个接口，来实现不同的功能。
+于是在父类中就可以新建一个这个类的field，通过改变类的field来实现功能。
+
+Observer Pattern
+简历两个interface
+
+1.subject:
+register注册一个新的Observer
+unregister取消一个observer
+notifyObsever发生修改时通知observer更新
+
+2.observer
+update，收到更新通知之后进行一系列的操作
