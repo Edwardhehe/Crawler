@@ -8,3 +8,55 @@
 java仍需要进一步理解的点：
 1.反射的概念和应用
 2.lambda表达式的应用，学习函数式编程
+
+10-14
+sql语句，一些数据库是用sql语句的但是另一些数据库不是用sql语句的
+中型和小型数据库一般都是收费的
+不是数据库的容量上限，数据库的容量上限是磁盘大小决定的；而是由数据库的性能决定。
+是根据存入数据多少量时，性能依然不影响。超大型数据库可以存储很大的数据量。
+
+绿色版和安装版
+我这里用的是安装版
+注意引号里面的路径写自己的路径
+cd mysql/bin
+
+只有加入path才可以才可以cmd
+
+1.mysql -u root -p
+这个数据库软件需要加分号；
+输入密码
+
+2.先创建一个数据仓库：
+create database helloWorld;
+query ok就可以创建了
+
+3.进入仓库：
+use xx数据库名称
+
+4.创建表
+  列：属性选项，username userpwd hobby sex
+  行：每一行就是一个用户数据 比如说：xxx
+  create table user(username varchar(15),userpwd varchar(15),age int(3));
+
+5.向表中插入数据
+insert into user values('大黄3','heheda1',33);
+
+6.查找一下放置过哪些数据？
+
+select * from user;
+命令行数据库如果查出乱码不用担心，因为命令行数据库编码不一致
+
+四.navicat的使用
+在这个navicat里面写命令行窗口；
+双击打开，选择连接。连接之后可以双击打开连接。
+之后在工具里面打开一个白窗口。
+
+数据类型：
+byte short int long
+insert into test1 values(123456789)
+float(5,3)表示总共有5个数字，但是小数有3位
+float与double精确的位数是不同的，如果懒得去算的话就使用double
+  容忍上限是8位到16位
+  decimal（要存大很长的数字） 与 bigdecimal
+String类型：
+char(n)固定长度的字符串一共255

@@ -31,3 +31,15 @@ notifyObsever发生修改时通知observer更新
 
 2.observer
 update，收到更新通知之后进行一系列的操作
+
+
+Fatory Pattern
+
+多个类继承自统一父类，要想根据外界信息动态的生成所想要的类的对象，就需要使用factory Pattern
+
+1.建立abstract class
+2.多个子类继承这个抽象父类
+3.建立工程方法，根据外界信息生成子类对象
+
+
+Abstract factory Pattern
