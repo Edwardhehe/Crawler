@@ -9,7 +9,7 @@ java仍需要进一步理解的点：
 1.反射的概念和应用
 2.lambda表达式的应用，学习函数式编程
 
-10-14
+-------------------------------------------------------------------------------
 sql语句，一些数据库是用sql语句的但是另一些数据库不是用sql语句的
 中型和小型数据库一般都是收费的
 不是数据库的容量上限，数据库的容量上限是磁盘大小决定的；而是由数据库的性能决定。
@@ -57,6 +57,134 @@ insert into test1 values(123456789)
 float(5,3)表示总共有5个数字，但是小数有3位
 float与double精确的位数是不同的，如果懒得去算的话就使用double
   容忍上限是8位到16位
+  create table test5 (aa decimal(20,18));
+    三个小数类型；
   decimal（要存大很长的数字） 与 bigdecimal
+
+
 String类型：
-char(n)固定长度的字符串一共255
+char(n)固定长度的字符串一共255 （开始时候就分配内存）
+varchar有限制的长度可变字符串65535个字符 （开始时候不分配内存）
+  差别在于上限不一样，n为指明他的上限；
+  tinytext
+  text 不用管几位
+  mediumtext
+  longtext
+
+二进制数据：
+真的可以存储二进制字节的，可以真的存一个图片
+
+日期和时间类型
+年月日时分秒
+date 只有日期
+time 只有时间
+datetime 试件和日期
+timestamp 受到时区的影响
+
+构件一个员工表：
+构件表列
+create table emp(empid int primary key auto_increment,empname varchar(20) not null,salary double(10,2) default 0,dept varchar(20),age int(3),birthday datetime);
+插入方法1
+  insert into emp values(1,'大黄1',123456.78,'保卫部',5,'2012-10-1 12:20:30');
+插入方法2
+  insert into emp(empname,salary,dept,age,birthday) value('李豪',30.23,'学习部',30,'1987-10-1 12:20:10');
+删除方法：
+  delete from emp where dept='市场部';
+更新方法：
+  update emp set dept='总经理' where dept='设计部';
+
+构建一个部门表：
+  id 主键 自动增长
+  部门名称
+  部门所在地
+
+  利用雇员表引用部门表
+  1	保卫部	中南海
+2	餐饮部	福建
+3	学习部	同济大学
+4	市场部	上海
+5	技术部	北京
+6	运动部	北京
+你引用的必须是主键，必须保证唯一性；
+
+必须对dept这个项目设计限制；
++-------+---------+-----------+------+-----+---------------------+
+| empid | empname | salary    | dept | age | birthday            |
++-------+---------+-----------+------+-----+---------------------+
+|     1 | 大黄1   | 123456.78 |    1 |   5 | 2012-10-01 12:20:30 |
+|     2 | 李豪    |     30.23 |    1 |  30 | 1987-10-01 12:20:10 |
+|     3 | 李豪1   |     30.23 |    1 |  30 | 1987-10-01 12:20:10 |
+|     4 | 李豪3   |    302312 |    1 |  30 | 1987-10-01 12:20:10 |
+|     5 | 李豪    |     12000 |    1 |  30 | 1987-10-01 12:20:10 |
++-------+---------+-----------+------+-----+---------------------+
+foreign key 进行约束
+外键可以是空，也可以重复，但是主键不能重复且不能为空；
+就是一张表的主键由另一张表引用，可以为null也可以重复
+同时外键要有约束
+--------------------------------------------------------------------------------
+  第二章
+什么是约束：约束是在表上强制执行的数据校验规则。
+desc 加表名字 就可以查看表结构
+可以只插入指定列数据
+1.not null 约束 不指定数据的话默认值就是空的；非空约束就是这个项目不能为空，比如用户名不可以为空；
+create table user(username varchar(5) not null);
+insert into user(username) value(null);这样子是不可以的
+0不是null 空字符串不是null 所有的数据类型默认值都可以是null;
+
+2.unique key 必须有唯一性约束；因为id必须具有唯一性
+ create table user1(username varchar(8) unique,userage int(5));
+   desc user:输出
++----------+------------+------+-----+---------+-------+
+| Field    | Type       | Null | Key | Default | Extra |
++----------+------------+------+-----+---------+-------+
+| username | varchar(8) | YES  | UNI | NULL    |       |
+| userage  | int(5)     | YES  |     | NULL    |       |
++----------+------------+------+-----+---------+-------+
+
+3.主键约束
+主键约束保证该属性必须非空 并且唯一；因为要作为当前行数据的唯一标志；
+比如加好友，有唯一标识的话会非常有效率
+将用户名设置为主键；
+create table user2(usernam varchar(5) primary key,userage int(5));
++---------+------------+------+-----+---------+-------+
+| Field   | Type       | Null | Key | Default | Extra |
++---------+------------+------+-----+---------+-------+
+| usernam | varchar(5) | NO   | PRI | NULL    |       |
+| userage | int(5)     | YES  |     | NULL    |       |
++---------+------------+------+-----+---------+-------+
+主键值只有一个 但是多个字段可以为联合主键
+比如用户名和性别同时作为主键存在，叫做联合主键
+mysql> create table user3(username varchar(5),usersex varchar(1),primary key(username,usersex));
+
+4.外键约束
+5.check约束，在mysql是不生效的，作为范围校验
+age int check (age>18 and age<20); mysql这个命令不生效
+
+
+数据库已经定义后，给数据库添加约束
+
+修改主键约束：
+ alter table user add constraint primary key(id)
+联合主键
+ alter table student add consrtaint primary key(id,name)
+增加唯一约束
+ alter table student add consrtaint unique(name)
+增加非空约束
+ alter table student modfiy name varchar(20) not null
+给主键添加自动增长约束
+ alter table student modify id int(5) auto_increment
+去掉自动增长和非空约束
+ alter table student modify id int(5)
+去掉主键约束
+ alter table student drop primary key;
+去掉唯一约束
+ alter table student drop index name;
+区分大小写
+ create table test1(name varchar(20) binary primary key)
+
+
+自动产生新的位移标识
+创建一个id列
+create table test4(id int primary key auto_increment);
+
+create table test5(id int primary key auto_increment,username varchar(20) binary);
