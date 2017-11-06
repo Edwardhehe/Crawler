@@ -1,0 +1,40 @@
+Arrays.sort必须实现comparable接口的类才可以使用
+实现comparable接口的类必须重写compareTo方法
+x小于y返回负数
+x大于y返回正数
+等于返回0
+可以使用下面的方法：
+Double.compare(x,y);
+integer.compare(x,y);
+接口的特性，
+1.不能使用new来实例化
+2.接口变量的引用必须使用实现了接口变量的类
+3.检查一个对象是否为一个借口的对象，则：
+使用 instanceof关键字
+接口中可以包含常量，接口声明变量后自动public static final关键字自己会加上
+可以重复实现两个接口：
+class Employee implements Cloneable, Comparable
+需要接口但是不使用抽象类的原因是，在java中抽象类不能多继承，但是接口可以多实现
+接口中可以提供默认方法，这在实际中也有一些用途，比如在gui编程中存在
+MouseListener接口，这个接口提供了默认方法，这是因为编写一个软件时候鼠标操作很大可能不会每个方法都有操作，因此提供默认方法可以实现只重写部分方法达到目的
+java解决接口冲突的方法：
+1.超类优先，A类继承了超类同时实现了方法，那么结果会以超类方法优先；
+2.一个接口提供默认方法，另一个接口提供相同方法，那么必须重写来解决冲突；
+
+  特殊的接口：
+1.Callback设计模式
+回调(callback)设计模式，就是当某个特定的事件发生后进行特定的动作，
+ActionListener listener=new TimePrinter();
+Time t=new Timer(10000,listener);
+2.比较器接口Comparator
+需要实现
+下面的方法：
+public int compare()
+Arrays.sort()这个里面还有新方法，接受参数为Comparator对象
+
+3.对象克隆cloneable接口
+  因为采用普通的赋值方法后，赋值对象的修改会影响原对象
+  clone又可以分为：
+  1.浅拷贝：对该对象进行克隆，但是对对象所包含的引用类型的域不能拷贝
+  2.深拷贝：对该对象的所有域都要进行深拷贝，需要实现cloneable方法。
+object中的clone方法是protected关键字开头，因此只有直接子类和在同一个包中的类可以使用。
