@@ -1,0 +1,258 @@
+基本概念：
+Processes:进程自己包含自己的资源，在内存中占用自己的资源
+Threads：是轻量的，是在进程内部的
+运行线程的方法有两种：
+1.
+  （1）实现runnable接口
+  （2）重写run方法
+  （3）实例化该类作为Thread类的构造器
+  （4）启动该对象的start（）方法
+
+public class HelloRunnable implements Runnable {
+
+    public void run() {
+        System.out.println("Hello from a thread!");
+    }
+
+    public static void main(String args[]) {
+        (new Thread(new HelloRunnable())).start();
+    }
+
+}
+2.
+  （1）继承Thread类
+  （2）重写run方法
+  （3）实例化该对象
+  （4）启动该对象的start（）方法
+public class HelloThread extends Thread{
+    public void run(){
+      System.out.println("Hello from a Thread");
+    }
+
+    public static void main(String[] args){
+        (new HelloWorld()).start();
+    }
+}
+
+评论：
+方法一考虑到java单继承的特点 并使用代理模式；在实现runnable接口后还可以再继承其他接口
+
+sleep方法
+Thread.sleep();是Thread的静态方法，但是这个睡眠时间是不一定准确的，取决于操作系统。
+同时它也会抛出一个异常：InterruptedException
+当sleep()过程中被其他线程打断时就会抛出这个异常
+
+InterruptedException
+
+这个例子代表被打断后就跳出循环 该线程结束
+for (int i = 0; i < importantInfo.length; i++) {
+    // Pause for 4 seconds
+    try {
+        Thread.sleep(4000);
+    } catch (InterruptedException e) {
+        // We've been interrupted: no more messages.
+        return;
+    }
+    // Print a message
+    System.out.println(importantInfo[i]);
+}
+
+//针对大型程序一般都是这么做
+
+for (int i = 0; i < inputs.length; i++) {
+    heavyCrunch(inputs[i]);
+    if (Thread.interrupted()) {
+        throw new InterruptedException();
+    }
+}
+
+在Thread类中有一个interrupt参数可以设置是否被打断的flag。
+如果抛出InterruptedException异常后该flag自动被还原
+
+t是一个Thread类的实例
+在一个方法中执行t.join();
+就是当t执行完毕之后，当前线程才开始执行；//和os情况有关
+
+下面的类实例，在main线程中等待线程t执行，如果执行时间大于patience的话，将t线程打断，执行主线程
+public class SimpleThreads {
+
+    // Display a message, preceded by
+    // the name of the current thread
+    static void threadMessage(String message) {
+        String threadName =
+            Thread.currentThread().getName();
+        System.out.format("%s: %s%n",
+                          threadName,
+                          message);
+    }
+
+    private static class MessageLoop
+        implements Runnable {
+        public void run() {
+            String importantInfo[] = {
+                "Mares eat oats",
+                "Does eat oats",
+                "Little lambs eat ivy",
+                "A kid will eat ivy too"
+            };
+            try {
+                for (int i = 0;
+                     i < importantInfo.length;
+                     i++) {
+                    // Pause for 4 seconds
+                    Thread.sleep(4000);
+                    // Print a message
+                    threadMessage(importantInfo[i]);
+                }
+            } catch (InterruptedException e) {
+                threadMessage("I wasn't done!");
+            }
+        }
+    }
+
+    public static void main(String args[])
+        throws InterruptedException {
+
+        // Delay, in milliseconds before
+        // we interrupt MessageLoop
+        // thread (default one hour).
+        long patience = 1000 * 60 * 60;
+
+        // If command line argument
+        // present, gives patience
+        // in seconds.
+        if (args.length > 0) {
+            try {
+                patience = Long.parseLong(args[0]) * 1000;
+            } catch (NumberFormatException e) {
+                System.err.println("Argument must be an integer.");
+                System.exit(1);
+            }
+        }
+
+        threadMessage("Starting MessageLoop thread");
+        long startTime = System.currentTimeMillis();
+        Thread t = new Thread(new MessageLoop());
+        t.start();
+
+        threadMessage("Waiting for MessageLoop thread to finish");
+        // loop until MessageLoop
+        // thread exits
+        while (t.isAlive()) {
+            threadMessage("Still waiting...");
+            // Wait maximum of 1 second
+            // for MessageLoop thread
+            // to finish.
+            t.join(1000);//等待1s后释放锁
+            if (((System.currentTimeMillis() - startTime) > patience)
+                  && t.isAlive()) {
+                threadMessage("Tired of waiting!");
+                t.interrupt();
+                // Shouldn't be long now
+                // -- wait indefinitely
+                t.join();
+            }
+        }
+        threadMessage("Finally!");
+    }
+
+
+  Synchronization:线程同步
+  线程同步是线程访问相同资源，会造成Thread interference
+  1.线程冲突
+  2.内存一致性冲突
+  3.Synchronized methods
+  4.implicit locks and Synchronization
+  5.原子操作
+  考虑下面的代码：
+  class Counter {
+    private int c = 0;
+
+    public void increment() {
+        c++;
+    }
+
+    public void decrement() {
+        c--;
+    }
+
+    public int value() {
+        return c;
+    }
+
+}
+当一个Counter对象被不同线程所访问时，会出现线程冲突；
+不要以为c++这样的代码是原子操作，因为在jvm虚拟机中其实这个操作是可以分为三部分：
+（1）释放当前变量c的值
+（2）对被释放的变量增加1
+（3）将该变量存储回c中
+
+这种操作的结果是难以预计的
+
+2.memory Consistency Errors
+一个变量在线程A中++，同时在线程b中sysout会出现该错误
+happen-before 关系：
+1.一个语句块调用了Thread.start();在该语句之前的语句都与thread线程有先后关系；
+2.当前线程执行thread.start()后面的语句与thread内部的语句有明确的先后关系；
+
+synchronized Method
+//该语句块有两个作用：
+1.后续语句块只有前面的语句块执行完成后，才能占用synchronized方法
+2.该方法定义了明确的先后顺序；
+
+public class SynchronizedCounter {
+    private int c = 0;
+
+    public synchronized void increment() {
+        c++;
+    }
+
+    public synchronized void decrement() {
+        c--;
+    }
+
+    public synchronized int value() {
+        return c;
+    }
+}
+
+synchronized的构造方法是不被允许的，因为只有该对象被创建后它才能被其他方法访问
+synchronized关键字可以保证操作的原子性，但是会降低liveness】
+该关键字的实现方法是，某个线程拿到了该对象的intrinsic lock，之后其他线程就无法难道该锁，
+此时可以由其他线程拿到该锁。因此线程就有了先后关系；
+对于静态方法的synchronized是拿到了Class对象的锁
+
+
+//synchronized代码块还有个作用就是减小程序的粒度fine-grained
+下面这个例子两个变量没关系，没必要更新c2的时候把c1锁掉
+因此他们新建了两个锁子对象，分别控制两个变量的更新
+
+public class MsLunch {
+    private long c1 = 0;
+    private long c2 = 0;
+    private Object lock1 = new Object();//认为设置了两个锁对象
+    private Object lock2 = new Object();
+
+    public void inc1() {
+        synchronized(lock1) {
+            c1++;
+        }
+    }
+
+    public void inc2() {
+        synchronized(lock2) {
+            c2++;
+        }
+    }
+}
+
+一个对象可以重复调用锁，名字叫做：reentrant Synchronization
+
+原子操作：
+1.对引用型变量的读写操作，和除了（long 和 double的基本变量操作）
+2.对于volatile变量的操作
+volatile 变量也有可能发生内存不一致；
+
+liveness problem:
+1.deadlock
+2.starvtion and livelock
