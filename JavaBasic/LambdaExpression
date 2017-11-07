@@ -127,3 +127,16 @@ Arrays.sort(people,Comparator.comparing(Parson::getName));
 Arrays.sort(people,Comparator.comparing(Person::getLastName).thenComparing(Person::getFirstName));
 Arrays.sort(pepole,comparator.comparing(Parson::getName,(s,t)->Integer.compare(s.length(),t.length())));
 Arrays.sort(people,Comparator.comparingInt(s.length(),t.length()));//避免自动装箱
+
+/**
+下面的是java lambda表达式的例子
+*/
+String[] strings=new String[] {"med","tmd","sda","fd","gf"};
+ArrayList<String> list=new ArrayList<>();
+for(int i=0;i<strings.length;i++) {
+  list.add(strings[i]);
+}
+list.removeIf(e->e.length()==2);
+Arrays.sort(strings,(a,b)->Integer.compare(a.length(), b.length()));
+System.out.println(Arrays.toString(strings));
+System.out.println("ArrayList还剩余"+list.toString());

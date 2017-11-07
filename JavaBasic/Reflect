@@ -1,0 +1,38 @@
+反射的作用：
+1.在运行时分析代码的能力
+2.在运行时查看对象
+3.实现通用的数组操作代码
+4.利用method对象，很像c++的函数指针
+
+1.
+getClass方法可以返回对象的一个Class实例
+Class的方法常用的有getName
+System.out.println(e.getClass().getName()+e.getName())//返回对象的名称
+e.getName()返回对象的名称
+e.getClass().getName()返回对象所属的类的名称
+2.
+方法2利用Class.forName()
+String className="java.util.Random";
+Class cl=Class.forName(className);
+可以保存在字符串中，运行时动态加载类；
+
+启动时包含main方法的类被加载，它会加载所有需要的类
+可以在main中不加载，运行时利用
+Class.forName动态的加载
+
+3.
+方法3：利用对象.class来获取class对象
+Class cl1=Random.class;
+Class cl1=int.class;
+Class cl3=Double[].class;
+
+可以利用
+对象名.class比较对象是否属于一个类型；
+
+newInstance方法动态生成一个新对象
+e.getClass().newInstance();//创建一个与e相同类型的实例，newinstance方法利用空构造器创建一个实例
+
+String s="java.util.Random";
+Object m=Class.forName(s).newInstance();
+主要用来动态加载类
+其余方法用到再看
