@@ -1,0 +1,129 @@
+lambda表达式是一个可传递的代码块，可以运行一次或者多次。
+例如一个比较器：
+1.lambda表达式配置一条语句
+（String first,String second)->first.length()-second.length();
+2.lambda表达式配置一个语句块
+(String first,String second)->{
+    if (first.length()<second.length()) return -1;
+    else if(first.length()<second.length()) return 1;
+    else return 0;
+}
+3.如果没有参数，则lambda表达式仍需要括号
+()->{for(int i=100;i>=0;i--)System.out.println(i)};
+4.如果参数类型可以推导出，那么lambda表达式可以忽略其类型
+比如：
+Comparator<String>comp=(first,second)->first.length()-second.length();
+本例子中因为比较器是String类型，因此可以自动的推出两个参数是String类型。
+如果只有一个参数，并且这个参数的类型可以推出，那么小括号可以省去：
+比如：
+ActionListener listener=event->System.out.println("This time is "+new Date());
+//instead of (event)-> or (ActionListener event)->
+下面的代码利用lambda表达式编写gui编程中的时间
+package lambda;
+
+import java.util.*;
+import java.swing.*;
+import javax.swing.Timer;
+
+public class lambadaTest{
+  public static void main(String[] args){
+    String[] planets=new String[]{"Mercury","Venus","Earth","Mars","Jupiter","Saturn","Uranus","Nepture"};
+    System.out.println(Arrays.toString(planets));
+    Arrays.sort(planets);
+    System.out.println(Arrays.toString(planets));
+    Arrays.sort(planets,(first,second)->first.length()-second.length());//利用lambda表达式创建比较器
+    System.out.println(Arrays.toString(planets));
+  }
+}
+
+函数式接口：
+对于只有一个抽象方法的接口，需要这种接口的对象时就可以提供一个lambda表达式
+例如：comparator<T>还有ActionListener接口
+
+java 还提供了下面的函数式接口：
+1.Bifunction<T,U,R>
+2.Predicate<T>
+ArrayList里面有个removeIf方法，例如：
+list.removeIf(e->e==null);//这个可以接受的参数就是一个Predicate接口
+
+方法引用：
+你希望只要出现一个定时器事件就打印这个事件的对象
+Timer t=new Timer(1000,event->System.out.println(event));
+也可以：
+Timer t=new Timer(1000,System.out::println);//这个叫做方法引用
+Arrays.sort(Strings,String::compareToIgnoreCase);
+于是对方法引用总结如下：
+object::intanceMethod
+Class::staticMethod
+Class::instanceMethod
+与lambda表达式相同，方法引用不能单独存在，必须作为某一个函数式接口的一个参数；
+
+Class Greeter{
+  public void greet(){
+    System.out.println("Hello world!")
+  }
+}
+
+class TimeedGreeter extends Gretter{
+  public void greet(){
+    Timer t=new Timer(1000,super::greet);//引用超类方法
+    t.start();
+  }
+}
+
+this::equals
+等价于：
+x->this.equals();
+
+构造器引用：
+Person::new就是引用Person类的构造器
+int[]::new就是数组的构造器，他只有一个参数，就是数组的大小
+
+
+Lambda表达式变量的作用域：
+Lambda表达式包含三个部分：
+1.一个代码块
+2.参数
+3.自由变量的值，这里是指非参数并且不在代码块中定义的变量
+lambda表达式会capture自由变量的值；为了线程安全，在lambda表达式中只能引用值不会改变的自由变量
+1.不能引用值会改变的外部变量
+2.不能声明与外部变量重名的变量
+3.lambda表达式引用this与出现在该方法中的其他变量类似，就是指该方法中的this变量；
+
+处理lambda表达式：
+使用lambda表达式的原因：
+1.在一个单独的线程运行代码
+2.多次运行代码
+3.在算法的适当位置运行代码
+4.发生某种情况时使用代码
+5.只有在必要时运行代码
+
+例如：
+
+public static void repeat(int n, Runnable action){
+    for (int i=0;i<n;i++){
+      action.run();
+    }
+}
+
+调用该程序时
+repeat(10,()->System.out.println("Hello World!"));//利用lambda表达式函数式接口调用；
+下面要实现显示这个程序是在第几次迭代中使用的？
+public static void repeat(int n,IntConsumer action ){
+      for(int i=0;i<n;i++){
+          action.accept(i)；
+      }
+}
+
+public interface IntConsumer{
+    void accept(int value);
+}
+
+调用时使用lambda表达式：
+repeat(10,i->System.out.println("Countdown:"+(9-i)));
+
+comparator
+Arrays.sort(people,Comparator.comparing(Parson::getName));
+Arrays.sort(people,Comparator.comparing(Person::getLastName).thenComparing(Person::getFirstName));
+Arrays.sort(pepole,comparator.comparing(Parson::getName,(s,t)->Integer.compare(s.length(),t.length())));
+Arrays.sort(people,Comparator.comparingInt(s.length(),t.length()));//避免自动装箱
