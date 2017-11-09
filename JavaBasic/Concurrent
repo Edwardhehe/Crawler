@@ -256,3 +256,55 @@ volatile 变量也有可能发生内存不一致；
 liveness problem:
 1.deadlock
 2.starvtion and livelock
+
+1.deadlock:
+两个人是朋友，都是要给对方鞠躬，他们每个人都有一个原则就是必须在对方停止鞠躬后才停止鞠躬，假如两个人同时和对方鞠躬，那么就会陷入死锁；
+2.starvtion:
+几个线程共同享有一个资源，有一个线程对资源十分贪婪，大部分时间占用了该资源。这就导致了其他线程无法访问到该资源；造成饥饿
+3.livelock
+两个资源是否运行是取决于对方的时候会发生相互等待，造成活锁；
+4.Guarded Blocks
+在一个线程中设置一个参数，只有当该参数被其他线程改变时，该线程才会停止运行
+
+public synchronized void guardedJoy() {
+    // This guard only loops once for each special event, which may not
+    // be the event we're waiting for.
+    while(!joy) {//joy是一个标志位，它可以被其他线程所设置
+        try {
+            wait();
+        } catch (InterruptedException e) {}
+    }
+    System.out.println("Joy and efficiency have been achieved!");
+}
+
+分析两个方法：
+notify()//通知其他的随机的一个线程，该方法在massively parallel的Application中可以使用
+notifyAll()//通知其他所有线程
+
+
+import java.util.Random;
+
+public class Producer implements Runnable{
+    private Drop drop;
+
+    public Producer(Drop drop){
+        this.drop=drop;
+    }
+
+    public void run(){
+        String importantInfo[]={
+            "Mars eat oats".
+            "Does eat oats",
+            "Little Lambs eat ivy",
+            "a kid will eat ivy too"
+        };
+        Random random=new Random();
+
+        for (int i=0;i<importantInfo;i++){
+          drop.put()
+            try{
+                Thread.sleep
+            }
+        }
+    }
+}

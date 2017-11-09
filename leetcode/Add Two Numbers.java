@@ -4,6 +4,7 @@ class Solution {
 		ListNode p1 = l1, p2 = l2, p = solution;
 		int carry = 0;// 存储进位信息
 		int k = 0;// 存储求和信息
+		//声明循环内部两部分参数
 		int num1;
 		int num2;
 		while (p1 != null || p2 != null || carry == 1) {
