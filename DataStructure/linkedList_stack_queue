@@ -1,0 +1,118 @@
+栈stack：
+后进先出；
+队列queue：
+先进先出；
+利用一个数组来容纳栈元素，有一个标价s.top
+该标记作为表示栈顶部元素下标的index标记，s.top的大小为栈内部元素的数目；
+利用s.top的值可以检验该表格是否为空
+栈包含的方法有：
+isEmpty()
+
+if s.top==0
+  return true
+else
+  return false
+
+push()
+s.top=s.top+1;
+s[s.top]=x
+
+pop()
+if stack-empty(s)
+  error "underFlow"
+else S.top=s.top-1
+  return s[s.top+1]
+
+
+队列：
+队列也是通过数组来表示，有两个下标元素：q.head和q.tail
+其中q.head指向队列中第一个元素，而q.tail指向新元素可以插入的位置；
+因此当q.head=q.tail时，队列为空
+队列时在一个数组中循环放置的，因此当q.tail=q.head-1时，队列为满队列；
+包含方法：
+
+enqueue
+q[q.tail]=x;
+if q.tail==q.length:
+  q.tail=1
+else q.tail=q.tail+1
+
+dequeue
+x=q[q.tail]
+if q.head=q.length//这个体现了循环使用数组空间的概念
+  q.head=1
+else q.head=q.head+1
+return x
+
+
+链表：
+链表元素x，包含两个指针：prev和next
+如果prev=null则表示元素为头
+如果next=null则该元素为尾元素
+单链表：只有next
+循环链表：尾指针指向头元素
+已排序链表：链表元素大小为有序的
+链表方法：
+
+list-search(l,k){
+  x=l.head;
+  while x!=null and x.key!=k
+    x=x.next;
+  return x
+}
+//这个是在链表的头部插入元素
+list.insert(l,x){
+  x.next=l.head;
+  if l.head!=null
+    l.head.prev=x
+  l.head=x
+  x.prev=null
+}
+
+list.delete(l,x){
+//核心思想就是操作前序元素的尾指针指向下一个元素
+//后续元素的头指针指向上一个元素
+  if x.prev!=null//如果不是第一个元素
+    x.prev.next=x.next;
+  else l.head=x.next;如果是第一个元素，则吧头指针向后推
+  if x.next!=null//如果不是尾指针，就把下一个的头指针指向该元素的前一个元素
+    x.next.prev=x.prev
+}
+
+对于删除元素的方法：更通用的是在链表的前部和尾部之间连接哨兵元素
+得到了circular, doubly linked list with a sentinel有哨兵的双向链表
+于是删除方法简化为：
+list.delete(l,x){
+  x.prev.next=x.next;
+  x.next.prev=x.prev;
+}
+list-search(l,x){
+  x=l.nil.next;
+  while x!=l.nil and x.key!=k
+    x=x.next;
+  return x
+}
+
+list-insert(l,x){
+  x.next=l.nil.next
+  l.nil.next.prev=x;//原来哨兵的后一个是原来的链表头现在指定为x
+  l.nil.next=x;
+  x.prev=l.nil
+}
+//但是哨兵应该慎用，因为对于小链表很浪费资源
+
+链表还可以利用数组表示：
+数组编号  1 2 3 4 5 6 7 8
+next
+key
+prev
+
+三个数组表示法：next记录下个元素的下标，key记录元素内容 prev记录上一个元素的下标
+此外变量L存储的是头元素的下标
+
+单个数组表示链表：顺序如下：key，prev，next下标存储在相邻的三个位置中
+缺点是不可以存储不同类型的对象；
+
+垃圾收集器：
+三数组存储的案例中，剩余未使用的空间为自由表，增加的下一个元素为自由表的第一个元素，增加后删除自由表的首个元素，自由表缩减；
+这个数据组织形式可以是多个链表共享一组数组，共用一个垃圾收集器
