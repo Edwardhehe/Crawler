@@ -281,30 +281,194 @@ public synchronized void guardedJoy() {
 notify()//通知其他的随机的一个线程，该方法在massively parallel的Application中可以使用
 notifyAll()//通知其他所有线程
 
+public class Drop {
+    // Message sent from producer
+    // to consumer.
+    private String message;
+    // True if consumer should wait
+    // for producer to send message,
+    // false if producer should wait for
+    // consumer to retrieve message.
+    private boolean empty = true;
+
+    public synchronized String take() {
+        // Wait until message is
+        // available.
+        while (empty) {
+            try {
+                wait();
+            } catch (InterruptedException e) {}
+        }
+        // Toggle status.
+        empty = true;
+        // Notify producer that
+        // status has changed.
+        notifyAll();
+        return message;
+    }
+
+    public synchronized void put(String message) {
+        // Wait until message has
+        // been retrieved.
+        while (!empty) {
+            try {
+                wait();
+            } catch (InterruptedException e) {}
+        }
+        // Toggle status.
+        empty = false;
+        // Store message.
+        this.message = message;
+        // Notify consumer that status
+        // has changed.
+        notifyAll();
+    }
+}
 
 import java.util.Random;
 
-public class Producer implements Runnable{
+public class Consumer implements Runnable {
     private Drop drop;
 
-    public Producer(Drop drop){
-        this.drop=drop;
+    public Consumer(Drop drop) {
+        this.drop = drop;
     }
 
-    public void run(){
-        String importantInfo[]={
-            "Mars eat oats".
-            "Does eat oats",
-            "Little Lambs eat ivy",
-            "a kid will eat ivy too"
-        };
-        Random random=new Random();
-
-        for (int i=0;i<importantInfo;i++){
-          drop.put()
-            try{
-                Thread.sleep
-            }
+    public void run() {
+        Random random = new Random();
+        for (String message = drop.take();
+             ! message.equals("DONE");
+             message = drop.take()) {
+            System.out.format("MESSAGE RECEIVED: %s%n", message);
+            try {
+                Thread.sleep(random.nextInt(5000));
+            } catch (InterruptedException e) {}
         }
+    }
+}
+
+import java.util.Random;
+
+import java.util.Random;
+
+public class Producer implements Runnable {
+    private Drop drop;
+
+    public Producer(Drop drop) {
+        this.drop = drop;
+    }
+
+    public void run() {
+        String importantInfo[] = {
+            "Mares eat oats",
+            "Does eat oats",
+            "Little lambs eat ivy",
+            "A kid will eat ivy too"
+        };
+        Random random = new Random();
+
+        for (int i = 0;
+             i < importantInfo.length;
+             i++) {
+            drop.put(importantInfo[i]);
+            try {
+                Thread.sleep(random.nextInt(5000));
+            } catch (InterruptedException e) {}
+        }
+        drop.put("DONE");
+    }
+}
+
+public class ProducerConsumerExample {
+    public static void main(String[] args) {
+        Drop drop = new Drop();
+        (new Thread(new Producer(drop))).start();
+        (new Thread(new Consumer(drop))).start();
+    }
+}
+
+上述代码中Drop是一个集合类，其中take()方法，每消费完一个元素就将empty标志位转化为true，经过notifyAll()方法可以唤醒其他线程
+put()方法每生产一个元素，便将empty标志位改为false，经过notifyAll()方法可以唤醒其他线程；该设计模式的关键代码为：
+
+标志位：
+private boolean empty=true;
+
+方法中元素：
+while（empty）{
+  try{
+  wait();}
+  catch(InterruptedException e){
+
+  }
+}
+
+
+处理线程同步问题的另一个方法就是使用不可变量(immutable Objects)
+假设有个处理颜色的类：
+当执行以下代码时，
+SynchronizedRGB color =
+    new SynchronizedRGB(0, 0, 0, "Pitch Black");
+...
+int myColorInt = color.getRGB();      //Statement 1
+String myColorName = color.getName(); //Statement 2
+
+如果在语句1和语句2之间插入：color.set语句
+那么语句1和语句2得到的颜色信息就会不对应
+
+定义不变量的策略：
+1.不要提供setter方法；
+2.让所有的field均变为private final
+3.不允许子类重写方法，最简单的方法是给类加上 final；稍微复杂点的方法就是，利用私有构造器和工厂方法
+
+将RGB类改写为线程同步的策略：
+1.去掉set方法，反转色调方法invert改为调用该方法时新生成一个对象
+2.将所有的field添加final关键字
+3.将该类声明为final
+4.因为这个类包含一个String类额field，该类的本来就是immutable的
+final public class ImmutableRGB {//声明为final意味着不可更改
+
+    // Values must be between 0 and 255.
+    final private int red;
+    final private int green;
+    final private int blue;
+    final private String name;//声明为final，意味着指向的对象不可更改
+
+    private void check(int red,
+                       int green,
+                       int blue) {
+        if (red < 0 || red > 255
+            || green < 0 || green > 255
+            || blue < 0 || blue > 255) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public ImmutableRGB(int red,
+                        int green,
+                        int blue,
+                        String name) {
+        check(red, green, blue);
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.name = name;
+    }
+
+
+    public int getRGB() {
+        return ((red << 16) | (green << 8) | blue);
+    }
+
+    public String getName() {
+        return name;
+    }
+    /**
+    返回一个新对象
+    */
+    public ImmutableRGB invert() {
+        return new ImmutableRGB(255 - red,
+                       255 - green,
+                       255 - blue,
+                       "Inverse of " + name);
     }
 }
