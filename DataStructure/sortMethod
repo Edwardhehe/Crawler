@@ -1,0 +1,79 @@
+package sort;
+
+import java.util.Random;
+
+public class sortedList {
+	private int[] arrays;
+
+	public sortedList(int[] arrays) {
+		super();
+		this.arrays = arrays;
+	}
+	/**
+	拆入排序
+	时间复杂度：n^2
+	*/
+	public void insertSort() {
+		for (int i = 1; i < arrays.length; i++) {
+			int key = arrays[i];
+			int j = i - 1;
+			while (j >=0 && arrays[j] > key) {
+				arrays[j + 1] = arrays[j];
+				j = j - 1;
+			}
+			arrays[j + 1] = key;
+		}
+	}
+	/**
+	 * 归并排序
+	 时间复杂度：nlg(n)
+	 * @param p
+	 * @param r
+	 */
+	public void mergeSort(){
+		this.mergeSortin(0,arrays.length-1);
+	}
+	private void mergeSortin(int p,int r) {
+		if (p<r){
+			int q=(p+r)/2;
+			this.mergeSortin(p, q);
+			this.mergeSortin(q+1, r);
+			this.merge(p, q, r);
+		}
+	}
+	private void merge(int p,int q,int r) {
+		int n1=q-p+1;
+		int n2=r-q;
+		int[] L=new int[n1+1];
+		int[] R=new int[n2+1];
+		for (int i=0;i<n1;i++) {
+			L[i]=arrays[p+i];
+		}
+		for (int i=0;i<n2;i++) {
+			R[i]=arrays[q+i+1];
+		}
+		L[n1]=Integer.MAX_VALUE;
+		R[n2]=Integer.MAX_VALUE;
+		int i=0;
+		int j=0;
+		for(int k=p;k<=r;k++) {
+			if(L[i]<=R[j]) {
+				arrays[k]=L[i];
+				i=i+1;
+			}else {
+				arrays[k]=R[j];
+				j=j+1;
+			}
+		}
+	}
+
+	@Override
+	public String toString() {
+		String reString = "[";
+		for (int i = 0; i < arrays.length; i++) {
+			reString = reString + arrays[i]+",";
+		}
+		reString = reString + "]";
+		return reString;
+	}
+}
