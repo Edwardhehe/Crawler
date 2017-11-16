@@ -1,0 +1,132 @@
+按键是一个事件源对象。需要创建一个能对按键事件进行处理的对象，该对象称为一个事件处理器：
+不是所有的对象都能被称为一个事件处理器，需要满足以下条件：
+1.该对象必须是EventHandler<t extends Event>接口的一个实例
+2.EventHandler对象handler必须使用方法source.setOnAction(handler);和事件源对象进行注册
+例如：
+class OKHandlerClass implements EventHandler<Action>{
+    @override
+    public void start(ActionEvent e){
+
+    }
+}
+
+ Button btOK=new Button("OK");//生成按钮
+ OKHandlerClass hander1=new OKHandlerClass();//新建事件处理器
+ btok.setOnAction(handler1);//将事件处理器注册到按钮上
+继承关系如下：
+eventobject <-event<-ActionEvent
+                     inputEvent   mouseEvent
+                                  keyEvent
+                     windowEvent
+
+不同的gui控件触发的内容是不同的：
+button：actionevent
+textField：actionevent
+RadioButton：ActionEvent
+...
+
+
+下面的例子，是画一个圆圈，并且点击enlarge会放大圆圈；点击shrink会缩小圆圈
+public class ControlCircle extends Application {
+
+	private CirclePane circlepane=new CirclePane();
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		// TODO Auto-generated method stub
+		HBox hBox=new HBox();
+		hBox.setSpacing(10);
+		hBox.setAlignment(Pos.CENTER);
+		Button btlarge=new Button("Enlarge");
+		Button btshrink=new Button("Shrink");
+		hBox.getChildren().add(btlarge);
+		hBox.getChildren().add(btshrink);
+
+		btlarge.setOnAction(new EnlargeHandler());//注册一个事件
+		btshrink.setOnAction(new ShrinkHandler());
+		BorderPane borderPane=new BorderPane();
+		borderPane.setCenter(circlepane);
+		borderPane.setBottom(hBox);
+		BorderPane.setAlignment(hBox, Pos.CENTER);
+
+		Scene scene=new Scene(borderPane,200,150);
+		primaryStage.setTitle("ControlCircle");
+		primaryStage.setScene(scene);
+		primaryStage.show();
+
+	}
+  //两个事件的内部类，形状对应于ActionEvent
+
+	class EnlargeHandler implements EventHandler<ActionEvent>{
+
+		@Override
+		public void handle(ActionEvent event) {
+			// TODO Auto-generated method stub
+			circlepane.enlarge();
+		}
+
+	}
+	class ShrinkHandler implements EventHandler<ActionEvent>{
+
+		@Override
+		public void handle(ActionEvent event) {
+			// TODO Auto-generated method stub
+			circlepane.shrink();
+		}
+
+	}
+	public static void main(String[] args) {
+		launch(args);
+	}
+}
+
+
+class CirclePane extends StackPane{
+	private Circle circle=new Circle(50);
+
+	public CirclePane() {
+		getChildren().add(circle);
+		circle.setStroke(Color.BLACK);
+		circle.setFill(Color.WHITE);
+
+	}
+	public void shrink() {
+		circle.setRadius(circle.getRadius()>2?circle.getRadius()-2:circle.getRadius());
+	}
+	public void enlarge(){
+		circle.setRadius(circle.getRadius()+2);
+	}
+
+}
+
+lambda表达式版本，注册事件
+可以根据btlarge的类型自动推定事件的类型因此event不需要声明类型
+btlarge.setOnAction(event ->
+  circlepane.enlarge());
+btshrink.setOnAction(event ->
+  circlepane.shrink());
+
+1.内部类被编译成OuterClassName$InnerClassName
+2.内部类可以引用定义在所属类中的field和方法，因此内部类可以使得代码更加精简
+3.内部类可以使用可见性修饰符
+4.可以定义为static，但是不能访问外部类中的非静态成员
+5.如果一个内部类是静态的，那么可以使用下面的方法来创建一个内部类对象：
+OuterClass.InnerClass innerObject=new OuterClass.InnerClass();
+6.可以将相互依赖的类加入主类中，减少文件数量，有利于文件的组织
+7.可以避免类名的冲突
+
+匿名内部类版本：
+btlarge.setOnAction(new EventHandler<ActionEvent>(){
+  public void handle(ActionEvent e){
+    circlePane.enlarge();
+  }
+});
+特点：
+1.必须从一个父类继承或者实现一个接口，但是不能显示的含有extends 或者 implements
+2.必须实现父类接口中的所有抽象方法
+3.总是使用父类的无参构造方法来创建一个实例
+4.一个匿名内部类被编译成一个名为OuterClassName$n.class的类
+如果一个类中有两个内部类那么会被编译成：
+Test$1.class 和 Test$2.class
+
+lambda表达式：
+类型可以省略
