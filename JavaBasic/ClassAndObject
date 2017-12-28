@@ -1,0 +1,29 @@
+不能用一个静态方法访问非静态变量
+garbage collector只能回收new出来的对象
+garbage collection is not destruction
+finalize 方法永远和内存释放相关
+用于释放和非对象相关的内存占用，但是java 中一切都是对象，这玩意儿有啥用啊？
+其实可以对于native method的话有用，这些事c++创建的
+c++和c在内存释放时必须调用delete，否则会出现内存leak
+如果需要非storage方面的release，可以使用finalize（）
+如果你在打开一个文件io时没有及时关闭，那么会出问题，这个时候可以使用finalize
+进行检测
+class Book{
+  boolean checkedOut=false;
+  Book(boolean checkOut){
+    checkedOut=checkOut;
+  }
+
+  void checkIn(){
+    checkedOut=false;
+  }
+
+  /*
+  在运行gc后，这个方法会被执行
+  */
+  protected void finalize(){
+    if (checkedOut){
+      System.out.println("Error: checked out");
+    }
+  }
+}
