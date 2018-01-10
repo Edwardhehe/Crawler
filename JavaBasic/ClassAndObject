@@ -1,3 +1,4 @@
+
 不能用一个静态方法访问非静态变量
 garbage collector只能回收new出来的对象
 garbage collection is not destruction
@@ -27,3 +28,430 @@ class Book{
     }
   }
 }
+
+
+//子类会自动调用父类的构造器
+class Art {
+	Art() {
+		System.out.println("Art Contrcutor");
+	}
+}
+
+public class Cartoon extends Art {
+public Cartoon(){
+  System.out.println("Cartoon constructor");
+}
+
+	public static void main(String args[]) {
+		Cartoon x = new Cartoon();
+	}
+}
+
+即使不指定子类的默认构造器，java也会调用父类的构造器
+
+class Game{
+  Game(int i){
+    System.out.println("Game Constructor");
+  }
+}
+
+class BoardGame extends Game{
+  BoardGame(int i){
+    super(i);
+    System.out.println("BoardGame Constructor")；
+  }
+}
+
+public class Chess extends BoardGame{
+  Chess(){
+    super(11);
+    System.out.println("BoardGame Constructor");
+  }
+  public static void main(String args[]){
+    Chess x=new Chess();
+  }
+}
+
+
+
+//delegation
+class SpaceShipControls{
+  void up(int velocity){}
+  void down(int velocity){}
+  void left(int velocity){}
+  void right(int velocity){}
+  void forward(int velocity){}
+  void back(int velocity){}
+  void turboBoost(){
+  }
+}
+
+
+public class SpaceShipDelegation{
+  private String name;
+  private SpaceShipControls controls=
+  new SpaceShipControls();
+
+  public SpaceShipDelegation (String name){
+    this.name=name;
+  }
+  void up(int velocity){
+    controls.up(velocity);
+  }
+  void down(int velocity){
+    controls.down(velocity);
+  }
+  void left(int velocity){
+    controls.left(velocity);
+  }
+  void right(int velocity){
+    controls.right(velocity);
+  }
+  void forward(int velocity){
+    controls.forward(velocity);
+  }
+  void back(int velocity){
+    controls.back(velocity);
+  }
+  void turboBoost(){
+    controls.turboBoost();
+  }
+
+  publci static void main(Sting args[]){
+    SpaceShipDelegation protector=
+    new SpaceShipDelegation("NSEA Protector");
+    protector.forward(100);
+  }
+}
+
+
+%composition and inheritance
+class Plate {
+	Plate(int i) {
+		System.out.println("Plate Constructor");
+	}
+}
+
+class DinnerPlate extends Plate {
+	DinnerPlate(int i) {
+		super(i);
+		System.out.println("DinnerPlate Constructor");
+
+	}
+}
+
+class Utensil {
+	Utensil(int i) {
+		System.out.println("Utensil Constructor");
+	}
+}
+
+class Spoon extends Utensil {
+	Spoon(int i) {
+		super(i);
+		System.out.println("Spoon Constructor");
+	}
+}
+
+class Fork extends Utensil {
+	Fork(int i) {
+		super(i);
+		System.out.println("Fork Constructor");
+	}
+}
+
+class Knife extends Utensil {
+	Knife(int i) {
+		super(i);
+		System.out.println("knife Constructor");
+	}
+}
+
+class Custom {
+	Custom(int i) {
+		System.out.println("Custom Constructor");
+	}
+}
+
+public class PlaceSetting extends Custom {
+	private Spoon sp;
+	private Fork frk;
+	private Knife kn;
+	private DinnerPlate pl;
+
+	public PlaceSetting(int i) {
+		super(i + 1);
+		sp = new Spoon(i + 2);
+		frk = new Fork(i + 3);
+		kn = new Knife(i + 4);
+		pl = new DinnerPlate(i + 5);
+		System.out.println("PlaceSetting constructor");
+	}
+
+	public static void main(String[] args) {
+		PlaceSetting x = new PlaceSetting(9);
+	}
+}
+
+
+Garanteeing proper cleanup
+用户自定义清除
+//: reusing/CADSystem.java
+// Ensuring proper cleanup.
+package javaFx;
+
+//: reusing/CADSystem.java
+//Ensuring proper cleanup.
+class Shape {
+	Shape(int i) {
+		System.out.println("Shape constructor");
+	}
+
+	void dispose() {
+		System.out.println("Shape dispose");
+	}
+}
+
+class Circle extends Shape {
+	Circle(int i) {
+		super(i);
+		System.out.println("Drawing Circle");
+	}
+
+	void dispose() {
+		System.out.println("Erasing Circle");
+		super.dispose();
+	}
+}
+
+class Triangle extends Shape {
+	Triangle(int i) {
+		super(i);
+		System.out.println("Drawing Triangle");
+	}
+
+	void dispose() {
+		System.out.println("Erasing Triangle");
+		super.dispose();
+	}
+}
+
+class Line extends Shape {
+	private int start, end;
+
+	Line(int start, int end) {
+		super(start);
+		this.start = start;
+		this.end = end;
+		System.out.println("Drawing Line: " + start + ", " + end);
+	}
+
+	void dispose() {
+		System.out.println("Erasing Line: " + start + ", " + end);
+		super.dispose();
+	}
+}
+
+public class CADSystem extends Shape {
+	private Circle c;
+	private Triangle t;
+	private Line[] lines = new Line[3];
+
+	public CADSystem(int i) {
+		super(i + 1);
+		for (int j = 0; j < lines.length; j++)
+			lines[j] = new Line(j, j * j);
+		c = new Circle(1);
+		t = new Triangle(1);
+		System.out.println("Combined constructor");
+	}
+
+	public void dispose() {
+		System.out.println("CADSystem.dispose()");
+		// The order of cleanup is the reverse
+		// of the order of initialization:
+		t.dispose();
+		c.dispose();
+		for (int i = lines.length - 1; i >= 0; i--)
+			lines[i].dispose();
+		super.dispose();
+	}
+
+	public static void main(String[] args) {
+		CADSystem x = new CADSystem(47);
+		try {
+			// Code and exception handling...
+		} finally {
+			x.dispose();
+		}
+	}
+}
+
+
+Class Homer{
+  char doh(char c){
+    System.out.println("doh(char)");
+    return 'd';
+  }
+  float doh(float f){
+    System.out.println("doh(float)");
+    return 1.0f;
+  }
+}
+
+class Milhouse{}
+
+  class Bart extends Homer{
+    void doh(Milhouse m){//这个方法不会遮蔽上面两个方法
+      System.out.println("doh(Milhouse)");
+    }
+  }
+
+  public class Hide {
+public static void main(String[] args) {
+  Bart b = new Bart();
+  b.doh(1);
+  b.doh(‘x’);
+  b.doh(1.0f);
+  b.doh(new Milhouse());
+  }
+}
+
+class Engine{
+  public void start(){}
+  public void rev(){}
+  public void stop(){}
+}
+
+class Wheel{
+  public void inflate(int psi){
+  }
+}
+
+class Window{
+  public void rollup(){}
+  public void rolldown(){}
+}
+
+class Door{
+  public Window window =new Window();
+  public void open(){}
+  public void close(){}
+}
+
+public class Car{
+  public Engine engine=new Engine();
+  public Wheel[] wheel=new Wheel[4];
+  public Door left=new Door(),right=new Door();
+  public Car(){
+    for (int i=0;i<4;i++){
+      wheel[i]=new Wheel();
+    }
+  }
+  public static void main(Sting args){
+
+  }
+}
+
+combination 和 inherit都是在新类里面含有旧的类
+inherit是隐式的包含超类，并且继承所有的public方法，隐含着xx是xx的特殊情况这个含义
+combination 是显示的包含老的类，用于xx含有xx的关系，可以继使用类的部分public方法
+protect也会提供包可见性
+
+class Villain{
+  private String name;
+  protected void set(String nm){this.name=nm;}
+  public Villain(String name){
+    this.name=name;
+  }
+  pubic String toString(){
+    return name;
+  }
+}
+
+public class Orc extends Villain{
+  private in orcNumber;
+  public Orc(String name,int orcNumber){
+    super(name);
+    this.orcNumber=orcNumber;
+  }
+  public void change(String name,int orcNumber){
+    set(name);//这个类可以调用父类的protected方法，但是protected方法在包外部无法访问
+    this.orcNumber=orcNumber;
+  }
+  public String toString(){
+    return orcNumber+super.toString();
+  }
+  public static void main(String[] args){
+    Orc orc=new Orc("Limburger",12);
+    System.out.println(orc);
+    orc.change("Bob",19);
+    print(orc);
+  }
+}
+继承的一个最大的用处就是，子类是父类的一个类型，
+sub class is a type of super class;
+调用某个方法的时候会存在一个 upcasting 就是说把子类的对象可以适用于针对父类对象的方法
+
+class Instrument{
+  public void play(){}
+  static void tune(Instrument i){
+    i.play();
+  }
+}
+
+public class Wind extends Instrument{
+  public static void main（String[] args){
+    Wind flute=new Wind();
+    Instrument.tune(flute);//这里包含了upcasting
+  }
+}
+upcasting 是从一个具体的类型向一个更加general的类型进行转换。
+因为子类至少含有父类的全部方法，所以编译器允许不显示的类型转换
+也可以downcasting但是有问题
+
+
+final的问题：
+final data
+原因：
+1. 是一个运行时的常量，永远不会被改变
+2. 运行时创建的值，但是你不准备改变它
+
+对于primitives final 意味着值始终不会改变
+对于引用类型，final使得这个引用是一个常量，当一个引用指向一个对象时，这个引用不能被修改为指向另一个对象
+但是这个对象本身可以被修改，java不包含使得一个对象内容保持常量的能力
+这对array也成立
+
+类里面的fields 如果被 static final 修饰表示只有一个，并且是compile-time常量
+约定全部大写，并用下划线分割
+final 和 static final
+前者每个对象有一个，不同对象一直变，后者类中对象共有，只有一个
+
+
+blank final
+是指某个类的field是final,但是没有直接定义，这种field必须中初始化
+
+class Poppet{
+  private int i;
+  Poppet(int ii){i=ii;}
+}
+
+public class BlankFinal{
+  private final int i=0;
+  private final int j;
+  private final Poppet p;
+  public BlankFinal(){
+    j=1;//初始化blank final
+    p=new Poppet(1);//初始化引用类型
+  }
+  public BlankFinal(int x){
+    i=x;
+    p=new Poppet(x);
+  }
+  public static void main(String[] args){
+    new BlankFinal();
+    new BlankFinal(47);
+  }
+}
+
+也可以让一个arg加final,这个用在匿名类中，内部类中
