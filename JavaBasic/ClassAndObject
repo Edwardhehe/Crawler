@@ -492,3 +492,95 @@ Beetle.k initialized
 k = 47
 j = 39
 *///:~
+
+多态：
+
+class Cycle {
+  public move(){
+    System.out.println("play the music");
+  }
+}
+
+class Bicycle extends Cycle{
+  public move(){
+    System.out.println("bicycle move");
+  }
+}
+
+class Tricycle extends Cycle{
+  public move(){
+    System.out.println("Tricycle move");
+  }
+}
+
+public class Travel{
+  public static void move(Cycle c){
+    c.move();
+  }
+
+  public static void main(String[] args){
+    Bicycle b=new Bicycle();
+    move(Bicycle);
+  }
+}
+
+
+late binding 和 early binding
+前者运行时进行绑定，后者运行前就绑定
+final 可以动态绑定，但是不要指望这玩意儿可以提高效率
+
+Shape s=new Circle();
+s.draw();
+可以调用Circle类的draw()方法，因为动态绑定的存在
+
+
+class Shape{
+  public void draw(){}
+  public void erase(){}
+}
+
+class Circle extends Shape{
+  public void draw() { System.out.println("Circle.draw()"); }
+  public void erase() { System.out.println("Circle.erase()"); }
+}
+
+class Square extedns Shape{
+  @Override
+  public void draw() {  System.out.println("Square.draw()"); }
+  @Override
+  public void erase() {  System.out.println("Square.erase()"); }
+}
+public class Triangle extends Shape {
+  @Override
+  public void draw() { System.out.println("Triangle.draw()"); }
+  @Override
+  public void erase() { System.out.println("Triangle.erase()"); }
+}
+
+public class RandomShapeGenerator {
+  private Random rand = new Random(47);
+  public Shape next() {
+    switch(rand.nextInt(3)) {
+      default:
+      //动态绑定
+      case 0: return new Circle();
+      case 1: return new Square();
+      case 2: return new Triangle();
+    }
+  }
+}
+
+public class Shapes{
+  private static RandomShapeGenerator gen=new RandomShapeGenerator();
+  public static void main(String[] args){
+    Shape[] s=new Shape[9];
+    for(int i=0;i<s.lengt;i++){
+      s[i]=gen.next();
+    }
+    for (Shape shps:s){
+      shps.draw();
+    }
+  }
+}
+
+@override 父类private方法不好，因为父类的private方法对子类压根就不可见
