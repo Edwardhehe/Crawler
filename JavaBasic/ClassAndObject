@@ -584,3 +584,196 @@ public class Shapes{
 }
 
 @override 父类private方法不好，因为父类的private方法对子类压根就不可见
+
+fields 和 static 方法不会发生多态
+
+//fields
+class Super{
+  public int field=0;
+  public int getField(){return field;}
+}
+class Sub extends Super{
+  public int field =1;
+  public int getField(){return field;}
+  public int gey SuperField(){return super.field;}
+}
+public class FieldAccess{
+  public static void main(String[] args){
+    Super sup=new Sub();
+    Sub sub=new Sub();
+    System.out.println("sup.field = " + sup.field +
+    ", sup.getField() = " + sup.getField());
+    System.out.println("sub.field = " +sub.field +
+     ", sub.getField() = " +
+     sub.getField() +
+     ", sub.getSuperField() = " +
+     sub.getSuperField());
+  }
+}
+输出：
+sup.field = 0, sup.getField() = 1，但是super。field也不是默认调用的版本，必须用super.xx
+明示
+sub.field = 1, sub.getField() = 1, sub.getSuperField() = 0
+
+//static
+StaticSuper sup = new StaticSub(); // Upcast
+System.out.println(sup.staticGet());//这里调用的是父类的static方法，也就是说不发生多态
+System.out.println(sup.dynamicGet());
+
+class Glyph{
+  void draw(){
+    System.out.println("Glyph.draw()");
+  }
+  Glyph(){
+    System.out.println("Glyph() before draw()");
+    draw();//这个里面调用的是重写过的draw()
+    System.out.println("Glyph() after draw()");
+  }
+}
+
+class RoundGlyph extends Glyph{
+  private int radius=1;
+  RoundGlyph(int r){
+    radius=r;
+    System.out.println(print("RoundGlyph.RoundGlyph(), radius = " + radius);
+  }
+  @Override
+  void draw(){
+    System.out.println("RoundGlyph.draw(), radius = " + radius);
+  }
+}
+
+public class PolyConstructors{
+  public static void main(String[] args){
+    new RoundGlyph(5);
+  }
+}
+
+/* Output:
+Glyph() before draw()
+RoundGlyph.draw(), radius = 0
+Glyph() after draw()
+RoundGlyph.RoundGlyph(), radius = 5
+*///:~
+
+调用顺序：
+1.声明内存，所有的field采用默认的初始化。
+2.首先调用父类，按照extends的顺序回溯到最顶层，依次调用，父类构造器中有draw(),
+这里调用的是动态绑定的方法。
+3.后面的构造器依次调用
+4.derived class的构造器被调用
+
+如果是fields内部含有reference变量，那样在运行时会报出空指针异常
+
+所以构造器的原则就是：
+1.做最少的工作使得对象达到一个很好的状态，尽量避免调用其他方法
+2.调用final方法，或者private方法是安全的，因为他们都不能被子类重写。
+
+class Grain{
+  public String toString(){
+    return "Grain";
+  }
+}
+
+class wheat extends Grain{
+  public String toString(){
+    return "Wheat";
+  }
+}
+
+class Mill{
+  Grain process(){return new Grain();}
+}
+class WheatMill extends Mill{
+  Wheat process{return new Wheat();}
+}
+
+public class CovariantReturn{
+  public static void main(String[] args){
+    Mill m=new Mill();
+    Grain g=m.process();
+    System.out.println(g);
+    m = new WheatMill();
+    g = m.process();// 虽然g是Grain类型的引用，但是因为多态，重写了toString方法
+    System.out.println(g);
+  }
+}
+
+/* Output:
+Grain
+Wheat
+*///:~
+
+
+
+
+下面是个设计模式：
+state pattern
+
+import static net.mindview.util.Print.*;
+
+class Actor{
+  public void act(){
+
+  }
+}
+
+class SadActor{
+  public void act(){
+    print("SadActor");
+  }
+}
+
+class HappyActor{
+  public void act(){
+    print("HappyActor");
+  }
+}
+
+class Stage{
+  private Actor a=new SadActor();
+  public void change(){
+    a=new HappyActor();
+  }
+  public void perform(){
+    a.act();
+  }
+}
+
+public class Transmogrift{
+  public static void main(String[] args){
+    Stage stage=new Stage();
+    stage.perform();
+    stage.change();
+    stage.perform();
+  }
+}
+
+guideline:
+使用继承去描述行为的不同，使用fields去标书在场的变量
+
+class Useful{
+  public void f(){}
+  public void g(){}
+}
+class MoreUseful extends Useful{
+  public void f(){}
+  public void g(){}
+  public void u(){}
+  public void v(){}
+  public void w(){}
+}
+
+public class RTTI{
+  public static void main(String[] args){
+    Useful[] x={
+      new Useful(),
+      new MoreUseful()
+    };
+    x[0].f();
+    x[1].g();
+    ((MoreUseful)x[1]).u(); // Downcast/RTTI
+    ((MoreUseful)x[0]).u(); // Exception thrown,这个汇报错，因为指向的那个对象不含有这个
+    //方法
+  }
+}
