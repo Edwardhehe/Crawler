@@ -1,0 +1,3 @@
+registers 最快的存储设备，java不用你调配这个存储设备
+stack 存在于ram中，同归一个stack pointer来调配，存储java对象的引用，第二快。
+heap是在内存中的区域，比较flexiibility,存储new出来的对象。这个区域十分灵活
