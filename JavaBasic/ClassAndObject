@@ -777,3 +777,92 @@ public class RTTI{
     //方法
   }
 }
+
+
+interface
+可以由fields 但是自动加上static final
+就像是不同类之间的一个协议，实现这个的类都必须按照这个协议进行
+interface 里面的method默认就是public
+interface可以很方便的实现多继承
+interface 可以作为upcasting的类型，在这里可以使用多态，abstract class也是一样的
+
+
+
+strategy design pattern
+之前的代码重用必须是很多子类都继承自这个类，
+class Processor{
+  public String name(){
+    return getClass().getSimpleName();
+  }
+  Object process(Object input){return input;}
+}
+
+class Upcase extedns Processor{
+  String process(Object input){
+    return ((String) input).toUpperCase();
+  }
+}
+
+class DownCase extends Processor{
+  String process(Object input){
+    return ((String input).toLowerCase());
+  }
+}
+
+class Splitter extends Processor{
+  String Process(Object input){
+    return Arrays.toString((String input).split(" "));
+  }
+}
+
+public class Apply{
+  public static void process(Processor p, Object s){// static 方法才能调用外面的static方法
+    print("Using Processor " + p.name());
+    print(p.process(s));
+  }
+  public static String s="Disagreement with beliefs is by definition incorrect";
+  public static void main(String[] args){
+    process(new Upcase(),s);
+    process(new DownCase(),s);
+    process(new Splitter(),s);
+  }
+}
+strategy design pattern
+
+只要使用interface就能解决这个问题
+如下：
+
+
+Adapter design pattern
+
+//相当于把这个decouple了
+
+public interface Processor{
+  String name();
+  Object process(Object input);
+}
+
+另一个文件：
+
+class FilterAdapter implements Processor{
+  Filter filter;
+  public FilterAdapter(Filter filter){
+    this.filter=filter;
+  }
+  public String name(){return filter.name();}
+  public waveform process(Object input){
+    return filter.process((whaveform) input);
+  }
+}
+
+public class FilterProcessor {
+  public static void main(String[] args) {
+    Waveform w = new Waveform();
+    Apply.process(new FilterAdapter(new LowPass(1.0)), w);
+    Apply.process(new FilterAdapter(new HighPass(2.0)), w);
+    Apply.process(
+    new FilterAdapter(new BandPass(3.0, 4.0)), w);
+  }
+}
+
+多重implements interface如果有重名的话不能，不能仅仅靠返回值来区分方法。
