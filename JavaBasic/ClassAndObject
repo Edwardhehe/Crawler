@@ -1213,3 +1213,59 @@ public class Parcel11 {
 	}
 
 }
+
+listIterator 可以前后移动 也可以得到index
+
+    List<String> aList=new ArrayList<>();
+		aList.add("Mouse");
+		aList.add("cat");
+		aList.add("dog");
+		aList.add("Mouse");
+
+		ListIterator<String>iterator=aList.listIterator();
+		while(iterator.hasNext()) {
+			System.out.println(iterator.next()+" it index"+iterator.previousIndex());
+
+		}
+
+		while(iterator.hasPrevious()) {
+			System.out.println(iterator.previous()+" it index"+iterator.nextIndex());
+		}
+
+LinkedList具有和队列一样的功能
+    LinkedList<String> aList=new LinkedList<>();
+		aList.add("Mouse");
+		aList.add("cat");
+		aList.add("dog");
+		aList.add("Mouse");
+
+		System.out.println(aList.element());
+		System.out.println(aList.getFirst());
+		System.out.println(aList.removeFirst());
+		System.out.println(aList);
+
+stack：
+    Stack<String> stack=new Stack<>();
+		for(String string :"My dog has fleas!".split(" ")) {
+			stack.push(string);
+		}
+		while(!stack.empty()) {
+			System.out.println(stack.pop());
+		}
+
+set可以快速查找某个元素是否在集合里面
+
+
+hashSet可以统计每个单词出现的个数：
+
+Random random=new Random();
+Map<Integer, Integer>m=new HashMap<>();
+for (int i=0;i<10000;i++) {
+  int r=random.nextInt(20);
+  Integer freq=m.get(r);//取出来数字
+  m.put(r, freq==null ? 1:freq+1);//如果出现就加一
+}
+System.out.println(m);
+
+可以布置复杂的数据结构
+Map<String,List<Pet>>;
